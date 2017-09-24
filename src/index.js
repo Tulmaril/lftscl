@@ -28,20 +28,11 @@ function map(array, fn) {
  Напишите аналог встроенного метода reduce для работы с массивами
  */
 function reduce(array, fn, initial) {
-	var current = initial;
-
-	if (!current) {
-		current = array[0];
-			for (var i = 1; i < array.length; i++) {
-			current = fn(current, array[i], i, array);
-		}
-	} else {
-			for (var i = 0; i < array.length; i++) {
-			current = fn(current, array[i], i, array);
-		}
-	}
-	
-	return current;
+    var res = initial || array[0];
+    for (var i = initial ? 0 : 1; i < array.length; i++) {
+        res = fn(res, array[i], i, array);
+    }
+    return res;
 }
 
 /*
@@ -105,27 +96,55 @@ function upperProps(obj) {
  Задача 8 *:
  Напишите аналог встроенного метода slice для работы с массивами
  */
-function slice(array, from = 0, to) {
-	var arr = [];
+function slice(array, from, to) {
+    var arr = [];
+    var len = array.length;
+    var size;
+
+    from = from || 0;
     to = to || array.length;
 
-	if (to === undefined) {
-		to = array.length;
-	}
-	if (from < 0) {
-		from = array.length + from;
-	}
-	if (to < 0) {
-		to = array.length + to;
-	} else if (to > array.length) {
-        to == array.length;                           
-    }                                                     
+    if (to > len) {
+        to = len;
+    }
+    if (to < -len) {
+        to = -len;
+    }
+    if (from > len) {
+        from = len;
+    }
+    if (from < -len) {
+        from = -len;
+    }
+    if (to == 0) { return arr; }
+    if (to >= 0 && to < from) { return arr; }
+    if (to <= 0 && to < from) { return arr; }
 
-	for ( var i = from; i < to; i++) {
-		arr.push(array[i]);
-	}
 
-	return arr;
+    if (from < 0) {
+        from = len + from;
+    }
+    if (to < 0) {
+        to = len + to;
+    }
+
+    size = to - from;
+    if (size > 0) {
+        for ( var i = from; i < to; i++) {
+            arr.push(array[i]);
+        }
+    } else if (size < 0) {
+        size = Math.abs(to) - Math.abs(from);
+        for ( var i = Math.abs(from); i < Math.abs(to); i++) {
+            arr.push(array[i]);
+        }
+    } else {
+        return arr
+    }
+
+    arr.length = Math.abs(size);
+
+    return arr;
 }
 
 /*
