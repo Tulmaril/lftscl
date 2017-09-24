@@ -145,34 +145,38 @@ function deleteTextNodesRecursive(where) {
  *   texts: 3
  * }
  */
-function collectDOMStat(root) {
-    var obj = {
+function collectDOMStat(root, stat) {
+    var obj = stat || {
         tags: {},
         classes: {},
         texts: 0
     };
 
-    for (let i = 0; i < root.childNodes.length; i++) {
+    for (var i = 0; i < root.childNodes.length; i++) {
         var child = root.childNodes[i];
+
         if (child.nodeType == 3) {
             obj.texts += 1;
-        }
-        if (child.tagName) {
-            obj.tags[child.tagName] = root.getElementsByTagName(child.tagName).length;
-        }
+        } else {
+            if (!obj.tags[child.tagName]) {
+                obj.tags[child.tagName] = 1;
+            } else {
+                obj.tags[child.tagName]++;
+            }
 
-        if (child.classList) {
-            for (let i = 0; i < child.classList.length; i++) {
-                if (!obj.classes[child.classList[i]]) {
-                    obj.classes[child.classList[i]] = 1;
-                } else {
-                    obj.classes[child.classList[i]] += 1;
+            if (child.classList.length > 0) {
+                for (var j = 0; j < child.classList.length; j++) {
+                    if (!obj.classes[child.classList[j]]) {
+                        obj.classes[child.classList[j]] = 1;
+                    } else {
+                        obj.classes[child.classList[j]]++;
+                    }
                 }
             }
+            
         }
-        
-        if(child.nodeType != 3){
-            collectDOMStat(child);
+        if (child.nodeType != 3) {
+            collectDOMStat(child, obj);
         }
     }
 
