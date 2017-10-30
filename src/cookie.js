@@ -78,6 +78,16 @@ function setCookie(name, value, options) {
   document.cookie = updatedCookie;
 }
 
+function listCookies() {
+    var theCookies = document.cookie.split(';');
+    var aString = '';
+    for (var i = 1 ; i <= theCookies.length; i++) {
+        aString += i + ' ' + theCookies[i-1] + "\n";
+    }
+    return aString;
+}
+
+
 function getCookie(name) {
   var matches = document.cookie.match(new RegExp(
     "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
@@ -92,40 +102,56 @@ function deleteCookie(name) {
 }
 
 function filterCookies(value) {
+  drawTable();
+  var valueString = value.toString();
 	var tableArrNodes = listTable.children;
+  
 	for (var i = 0; i < tableArrNodes.length; i++) {
-		console.log(1)
-		if (!(tableArrNodes[i].children[0].innerText.indexOf(value) + 1) || !(tableArrNodes[i].children[1].innerText.indexOf(value) + 1)) {
-			tableArrNodes[i].remove();
-			console.log(tableArrNodes[i])
-		}
+		if ((tableArrNodes[i].children[0].innerText.indexOf(valueString) == -1) || (tableArrNodes[i].children[1].innerText.indexOf(valueString) == -1)) {
+			tableArrNodes[i].style.display = "none";
+		} else {
+      tableArrNodes[i].style.display = "table-row";
+    }
 	}
 }
 
+document.addEventListener("DOMContentLoaded", function() {
+  drawTable();
+});
 
 filterNameInput.addEventListener('keyup', function(e) {
-	var filterVal = e.target.value;
-	console.log(filterVal);
-	filterCookies(filterVal);
+	var filterVal = e.target.value.toString();
+  var filterValString = filterVal.toString();
+	console.log(filterValString);
+	filterCookies(filterValString);
 });
+
+
 
 addButton.addEventListener('click', () => {
 	if (addNameInput.value != '' && addValueInput.value != '') {
 		if (!getCookie(addNameInput.value)) {
+
 			setCookie(addNameInput.value, addValueInput.value, {expires: 60});
-
-			var newTr = document.createElement('tr');
-  			newTr.innerHTML = '<td>'+addNameInput.value+'</td><td>'+addValueInput.value+'</td><td><button type="button" class="deleteButton">delete</button></td>';
-			listTable.appendChild(newTr);
-		} else {
-			var nodes = listTable.children;
-			for (var i = 0; i < nodes.length; i++) {
-				if (nodes[i].children[0].innerText == addNameInput.value) {
-					nodes[i].children[1].innerHTML = addValueInput.value;
-				}
-			}
+      listTable.innerHTML = "";
+      drawTable();
 		}
+    addNameInput.value = '';
+    addValueInput.value = '';
 	}
-
-	
 });
+
+function drawTable() {
+  listTable.innerHTML = "";
+  var output = {};
+  document.cookie.split(/\s*;\s*/).forEach(function(pair) {
+    pair = pair.split(/\s*=\s*/);
+    output[pair[0]] = pair.splice(1).join('=');
+  });
+
+  for ( var cooke in output ) {
+    var newTrt = document.createElement('tr');
+    newTrt.innerHTML = '<td>'+cooke+'</td><td>'+output[cooke]+'</td><td><button type="button" class="deleteButton">delete</button></td>';
+    listTable.appendChild(newTrt);
+  }
+}
