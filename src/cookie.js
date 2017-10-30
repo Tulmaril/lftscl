@@ -103,14 +103,13 @@ function deleteCookie(name) {
 
 function filterCookies(value) {
   drawTable();
-  var valueString = value.toString();
 	var tableArrNodes = listTable.children;
   
 	for (var i = 0; i < tableArrNodes.length; i++) {
-		if ((tableArrNodes[i].children[0].innerText.indexOf(valueString) == -1) || (tableArrNodes[i].children[1].innerText.indexOf(valueString) == -1)) {
-			tableArrNodes[i].style.display = "none";
+		if ((tableArrNodes[i].children[0].innerText.indexOf(value) != -1) || (tableArrNodes[i].children[1].innerText.indexOf(value) != -1)) {
+			tableArrNodes[i].style.display = "table-row";
 		} else {
-      tableArrNodes[i].style.display = "table-row";
+      tableArrNodes[i].style.display = "none";
     }
 	}
 }
@@ -120,22 +119,18 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 filterNameInput.addEventListener('keyup', function(e) {
-	var filterVal = e.target.value.toString();
-  var filterValString = filterVal.toString();
-	console.log(filterValString);
-	filterCookies(filterValString);
+	var filterVal = e.target.value;
+	filterCookies(filterVal);
 });
 
 
 
 addButton.addEventListener('click', () => {
 	if (addNameInput.value != '' && addValueInput.value != '') {
-		if (!getCookie(addNameInput.value)) {
-
-			setCookie(addNameInput.value, addValueInput.value, {expires: 60});
-      listTable.innerHTML = "";
-      drawTable();
-		}
+		setCookie(addNameInput.value, addValueInput.value, {expires: 60});
+    listTable.innerHTML = "";
+    drawTable();
+    filterCookies(filterNameInput.value);
     addNameInput.value = '';
     addValueInput.value = '';
 	}
@@ -144,6 +139,7 @@ addButton.addEventListener('click', () => {
 function drawTable() {
   listTable.innerHTML = "";
   var output = {};
+
   document.cookie.split(/\s*;\s*/).forEach(function(pair) {
     pair = pair.split(/\s*=\s*/);
     output[pair[0]] = pair.splice(1).join('=');
